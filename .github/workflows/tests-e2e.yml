@@ -1,0 +1,42 @@
+name: Tests de bout en bout
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "15 12 * * *"   # chaque jour à 12 h 15 UTC (7 h 15 heure de l'Est) : surveillance du site en production
+  workflow_dispatch:
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        navigateur: [chromium, firefox]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - name: Installer les dépendances
+        run: pip install -r requirements.txt
+      - name: Installer le navigateur
+        run: python -m playwright install --with-deps ${{ matrix.navigateur }}
+      - name: Lancer les tests
+        run: >
+          pytest --browser ${{ matrix.navigateur }}
+          --html=rapport/rapport-${{ matrix.navigateur }}.html --self-contained-html
+          --junitxml=rapport/junit-${{ matrix.navigateur }}.xml
+      - name: Publier le rapport et les traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rapport-${{ matrix.navigateur }}
+          path: |
+            rapport/
+            test-results/
+          retention-days: 14
