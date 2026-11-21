@@ -38,11 +38,12 @@ def test_tc_p03_chaque_projet_mene_a_son_depot(accueil: Page):
     assert attendus <= {c.rstrip("/").split("/")[-1] for c in cibles}
 
 
-def test_tc_p04_lien_vers_la_demo(accueil: Page, base_url: str):
-    lien = accueil.get_by_role("link", name=re.compile("Essayer la démo en ligne"))
+@pytest.mark.parametrize("projet, demo", [("ADAS", "/demo-pietons/"), ("pièces de monnaie", "/demo-pieces/")])
+def test_tc_p04_lien_vers_la_demo(accueil: Page, base_url: str, projet, demo):
+    lien = accueil.locator("article", has_text=projet).get_by_role("link", name=re.compile("Essayer la démo en ligne"))
     expect(lien).to_be_visible()
     lien.click()
-    expect(accueil).to_have_url(base_url + "/demo-pietons/")
+    expect(accueil).to_have_url(base_url + demo)
 
 
 def test_tc_p05_resultat_adas_a_jour(accueil: Page):
@@ -77,7 +78,7 @@ def test_tc_p09_pas_de_defilement_horizontal(page: Page, base_url: str, largeur,
     assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
 
 
-@pytest.mark.parametrize("chemin", ["/", "/demo-pietons/"])
+@pytest.mark.parametrize("chemin", ["/", "/demo-pietons/", "/demo-pieces/"])
 def test_tc_p10_metadonnees_de_partage(page: Page, base_url: str, chemin):
     """Image d'aperçu pour les partages (défaut DEF-007 sur la démo)."""
     page.goto(base_url + chemin)

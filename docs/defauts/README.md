@@ -1,6 +1,6 @@
 # Rapports de défauts
 
-Défauts trouvés sur le portfolio et la démo, par les tests automatisés, l'audit d'accessibilité ou la relecture. Chaque défaut corrigé est couvert par un test de non-régression, ou à défaut par une vérification visuelle.
+Défauts trouvés sur le portfolio et les démos, par les tests automatisés, l'audit d'accessibilité ou la relecture. Chaque défaut corrigé est couvert par un test de non-régression, ou à défaut par une vérification visuelle.
 
 | ID | Titre | Gravité | Statut | Test |
 |---|---|---|---|---|
@@ -11,3 +11,6 @@ Défauts trouvés sur le portfolio et la démo, par les tests automatisés, l'au
 | [DEF-005](DEF-005.md) | Un fichier qui n'est pas une image est ignoré sans message | Mineure | Corrigé | TC-D05 |
 | [DEF-006](DEF-006.md) | La hiérarchie des titres saute un niveau dans la section Compétences | Mineure | Corrigé | TC-A03 |
 | [DEF-007](DEF-007.md) | La démo n'a pas d'image d'aperçu pour les partages | Cosmétique | Corrigé | TC-P10 |
+| [DEF-008](DEF-008.md) | Les barres de probabilité de la démo des pièces restent vides | Majeure | Corrigé avant la mise en ligne | TC-C04 |
+| [DEF-009](DEF-009.md) | Un pourcentage de la démo des pièces passe sur deux lignes | Cosmétique | Corrigé avant la mise en ligne | TC-C05 |
+| [DEF-010](DEF-010.md) | Probabilité élevée pour une image qui n'est pas une pièce | Mineure | Accepté (limite connue, avertissement ajouté) | TC-C02 |

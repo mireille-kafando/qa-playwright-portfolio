@@ -1,4 +1,7 @@
-"""Fixtures communes : collecte des erreurs de la console, page de démo prête, image d'exemple."""
+"""Fixtures communes : collecte des erreurs de la console, pages de démo prêtes, données de test."""
+import json
+from pathlib import Path
+
 import pytest
 from playwright.sync_api import Page, expect
 
@@ -43,3 +46,31 @@ def attendre_nouvelle_analyse(page: Page, ancien_libelle: str):
 
 def compteurs(page: Page):
     return int(page.locator("#nPed").inner_text()), int(page.locator("#nRider").inner_text())
+
+
+# --- Démo de reconnaissance de pièces (TC-C) ---
+DEMO_PIECES = "/demo-pieces/"
+DONNEES = Path(__file__).parent / "donnees"
+
+
+@pytest.fixture
+def demo_pieces(page: Page, base_url: str):
+    """Ouvre la démo des pièces et attend que le modèle (15 Mo) soit chargé."""
+    page.goto(base_url + DEMO_PIECES)
+    expect(page.get_by_role("button", name="Choisir une photo de pièce")).to_be_enabled(timeout=90_000)
+    return page
+
+
+def analyser(page: Page, chemin):
+    """Envoie une image et attend les nouvelles probabilités."""
+    page.evaluate("window.__probabilites = undefined")
+    page.locator("#file").set_input_files(chemin)
+    page.wait_for_function("window.__probabilites !== undefined", timeout=60_000)
+    return page.evaluate("window.__probabilites")
+
+
+@pytest.fixture
+def reference_pieces():
+    """Image synthétique et probabilités calculées en Python (onnxruntime) avec le même modèle."""
+    ref = json.loads((DONNEES / "reference_piece_synthetique.json").read_text())
+    return DONNEES / ref["image"], ref["probabilites"]

@@ -1,8 +1,8 @@
-# Plan de test : portfolio et démo de détection de piétons
+# Plan de test : portfolio et démos (détection de piétons, reconnaissance de pièces)
 
 | | |
 |---|---|
-| Système sous test | Portfolio [mireille-kafando.github.io](https://mireille-kafando.github.io) et démo [`/demo-pietons/`](https://mireille-kafando.github.io/demo-pietons/) |
+| Système sous test | Portfolio [mireille-kafando.github.io](https://mireille-kafando.github.io), démos [`/demo-pietons/`](https://mireille-kafando.github.io/demo-pietons/) et [`/demo-pieces/`](https://mireille-kafando.github.io/demo-pieces/) |
 | Version testée | Dépôt `mireille-kafando.github.io`, branche `main` (déploiement GitHub Pages) |
 | Auteure | Mireille Kafando |
 | Date | Novembre 2026 |
@@ -18,12 +18,13 @@
 
 **Inclus :**
 - page d'accueil : contenu clé, bascule français/anglais et sa persistance, liens vers les dépôts et la démo, mise en page de 375 à 1 440 pixels, métadonnées de partage ;
-- démo : chargement du modèle ONNX, analyse automatique de l'image d'exemple, seuil de confiance, choix du modèle v1/v2, envoi d'une image, cas d'erreur (fichier non image, image illisible), bascule de langue ;
-- accessibilité de base des deux pages ;
+- démo des piétons : chargement du modèle ONNX, analyse automatique de l'image d'exemple, seuil de confiance, choix du modèle v1/v2, envoi d'une image, cas d'erreur (fichier non image, image illisible), bascule de langue ;
+- démo des pièces : chargement du modèle, probabilités identiques à celles calculées en Python, cohérence de l'affichage (barres, pourcentages, verdict), cas d'erreur, bascule de langue, description textuelle du résultat ;
+- accessibilité de base des trois pages ;
 - validité des liens externes.
 
 **Exclus :**
-- **qualité du modèle de détection :** elle est mesurée dans le dépôt [pedestrian-detection-adas](https://github.com/mireille-kafando/pedestrian-detection-adas). Ici, on vérifie seulement que la démo produit des détections cohérentes ;
+- **qualité des modèles :** elle est mesurée dans les dépôts [pedestrian-detection-adas](https://github.com/mireille-kafando/pedestrian-detection-adas) et [coin-classification-cnn](https://github.com/mireille-kafando/coin-classification-cnn). Ici, on vérifie que chaque démo exécute correctement son modèle ;
 - **performances fines :** le temps d'inférence est affiché et contrôlé, mais pas mesuré par rapport à un objectif chiffré ;
 - **audit d'accessibilité complet :** contrastes, navigation au clavier détaillée, lecteurs d'écran réels.
 
@@ -38,7 +39,8 @@
 
 - **Sélecteurs :** les tests privilégient les rôles et les noms accessibles (`get_by_role`), comme un utilisateur ou un lecteur d'écran, plutôt que la structure CSS.
 - **Attentes :** elles sont explicites (`expect`) et jamais fixes ; le chargement du modèle (13 Mo) dispose d'un délai de 90 secondes.
-- **Données de test :** l'image d'exemple de la démo, un fichier texte et un JPEG volontairement corrompu, générés pendant le test.
+- **Données de test :** l'image d'exemple de la démo des piétons, un fichier texte et un JPEG volontairement corrompu, générés pendant le test. Pour la démo des pièces, une image synthétique (`tests/donnees/piece_synthetique.png`, un disque gris dessiné), car les photos du jeu ICDD ne sont pas redistribuées.
+- **Oracle de référence (démo des pièces) :** les probabilités de l'image synthétique ont été calculées en Python avec onnxruntime et le même modèle (`tests/donnees/reference_piece_synthetique.json`). Le navigateur doit retrouver ces valeurs à 0,001 près : cela vérifie tout le prétraitement (taille 224 × 224, ordre des canaux, division par 255, format NHWC) et l'ordre des classes en sortie.
 
 ## 4. Environnements
 
@@ -75,9 +77,18 @@
 | TC-A03 | Accessibilité | Les niveaux de titres ne sautent pas de niveau | Basse |
 | TC-A04 | Accessibilité | La langue du document est déclarée | Moyenne |
 | TC-A05 | Accessibilité | Le résultat de la démo est décrit en texte, pas seulement dessiné | Moyenne |
+| TC-C01 | Démo pièces | Le modèle se charge, la liste des 4 classes est affichée, aucune erreur JavaScript | Haute |
+| TC-C02 | Démo pièces | Les probabilités de l'image synthétique sont celles calculées en Python (à 0,001 près) | Haute |
+| TC-C03 | Démo pièces | Probabilités entre 0 et 1, de somme 1 ; la ligne mise en avant et le verdict désignent la classe la plus probable | Haute |
+| TC-C04 | Démo pièces | Chaque barre est remplie en proportion de sa probabilité | Moyenne |
+| TC-C05 | Démo pièces | Chaque pourcentage est au format « 98,5 % » et tient sur une ligne | Basse |
+| TC-C06 | Erreurs | Un fichier qui n'est pas une image affiche un message, sans verdict | Moyenne |
+| TC-C07 | Erreurs | Une image illisible affiche un message | Moyenne |
+| TC-C08 | Langue | La démo bascule en anglais, noms de classes et séparateur décimal compris | Basse |
+| TC-C09 | Accessibilité | L'image analysée a un texte alternatif qui donne le résultat ; le verdict est annoncé | Moyenne |
 | TC-L01 | Liens | Aucun lien externe en erreur (LinkedIn, qui répond 999 aux robots, est toléré) | Moyenne |
 
-Les cas paramétrés sont exécutés sur chaque page ou chaque largeur concernée. Avec deux navigateurs, cela donne 66 exécutions.
+Les cas paramétrés sont exécutés sur chaque page, chaque démo ou chaque largeur concernée. Avec deux navigateurs, cela donne 98 exécutions.
 
 ## 6. Critères d'entrée et de sortie
 
@@ -101,5 +112,6 @@ Chaque défaut fait l'objet d'un rapport dans [`defauts/`](defauts/), avec :
 ## 8. Risques et limites
 
 - **Tests réseau instables :** les tests de liens dépendent de sites tiers et peuvent échouer de façon intermittente (limitation de débit, blocage des robots). Ils sont isolés par le marqueur `liens`.
-- **Écarts entre navigateurs :** le redimensionnement des images par le navigateur peut légèrement changer les scores de confiance. Les vérifications portent donc sur des bornes, comme « au moins 3 piétons », plutôt que sur des valeurs exactes.
+- **Écarts entre navigateurs :** le redimensionnement des images par le navigateur peut légèrement changer les scores de confiance. Les vérifications portent donc sur des bornes, comme « au moins 3 piétons », plutôt que sur des valeurs exactes. L'image synthétique de la démo des pièces mesure déjà 224 × 224 pixels : elle n'est pas redimensionnée, ce qui permet une comparaison exacte.
+- **Démo des pièces et entraînement :** pour une vraie photo, le navigateur redimensionne avec une interpolation bilinéaire, alors que Keras utilisait le plus proche voisin, et la démo utilise une version compressée du modèle (poids sur 8 bits). Sur 40 photos de test vérifiées localement, la démo donne la même classe que le modèle Keras pour 37.
 - **Accessibilité partielle :** les règles automatisées ne remplacent pas un test avec un lecteur d'écran.

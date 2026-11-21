@@ -13,7 +13,7 @@ def liens_externes(page: Page, url: str):
     return page.locator("a[href^='http']").evaluate_all("els => [...new Set(els.map(e => e.href))]")
 
 
-@pytest.mark.parametrize("chemin", ["/", "/demo-pietons/"])
+@pytest.mark.parametrize("chemin", ["/", "/demo-pietons/", "/demo-pieces/"])
 def test_tc_l01_liens_externes_valides(page: Page, base_url: str, chemin):
     morts = []
     for lien in liens_externes(page, base_url + chemin):
