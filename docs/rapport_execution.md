@@ -1,6 +1,26 @@
 # Rapport d'exécution
 
-## Campagne du 21 novembre 2026
+## Campagne du 21 novembre 2026 (ajout de la démo des pièces)
+
+| | |
+|---|---|
+| Version testée | Portfolio, commit `370e2e2` : ajout de `/demo-pieces/` et du lien depuis la carte du projet |
+| Exécution locale | Chromium, copie locale du site : 46 réussis sur 46 (hors tests de liens), en 90 secondes |
+| Intégration continue | GitHub Actions, run `44908632517`, site en production : **49 réussis sur Chromium, 49 sur Firefox**, tests de liens compris |
+
+Nouveaux cas : TC-C01 à TC-C09 (démo des pièces). Cas étendus à la nouvelle page : TC-P04 (lien de chaque carte vers sa démo), TC-P10 (image d'aperçu), TC-A01 à TC-A04 (accessibilité), TC-L01 (liens).
+
+**Défauts trouvés pendant la mise au point de la démo** (avant la mise en ligne) :
+
+| Défaut | Trouvé par | Vérification du test de non-régression |
+|---|---|---|
+| DEF-008 : barres de probabilité vides | Capture d'écran pendant l'écriture de TC-C04 | TC-C04 échoue sur la version d'origine (largeur de barre nulle) |
+| DEF-009 : pourcentage coupé sur deux lignes | Même capture | TC-C05 échoue sur la version d'origine (hauteur 46,5 px pour une ligne de 23,25 px) |
+| DEF-010 : probabilité élevée pour une image qui n'est pas une pièce | Image synthétique de TC-C02 classée « 2 roupies » à 98,5 % | Limite du modèle, acceptée ; avertissement ajouté sur la page |
+
+**Cohérence du modèle :** sur l'image synthétique, les probabilités calculées dans Chromium diffèrent de celles calculées en Python de moins de 0,000001 (tolérance du test : 0,001). Sur 40 photos de test du jeu ICDD, vérifiées localement et non publiées, la démo donne la même classe que le modèle Keras pour 37 : les 3 écarts viennent de la compression du modèle et de l'interpolation utilisée pour réduire les photos.
+
+## Campagne du 21 novembre 2026 (première version)
 
 | | |
 |---|---|
