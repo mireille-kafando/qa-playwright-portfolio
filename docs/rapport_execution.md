@@ -1,5 +1,33 @@
 # Rapport d'exécution
 
+## Campagne du 21 novembre 2026 (tests d'API, tests HTTP et scénarios BDD)
+
+| | |
+|---|---|
+| Version testée | Portfolio, commit `1cf0f2d` (carte du projet QA, bouton de langue corrigé), site en production |
+| Intégration continue | GitHub Actions, run `44925483436`, sur la branche `api-bdd` avant la fusion dans `main` |
+| Chromium | **88 réussis, 1 échec attendu** (TC-API04 pour DEF-011), 0 échec, en 65 secondes |
+| Firefox | **58 réussis**, 31 sautés (tests d'API et HTTP, exécutés une seule fois, dans la tâche Chromium), 0 échec |
+| Outils | Python 3.13, pytest 9.2, pytest-playwright 0.10, pytest-bdd 9.0, jsonschema 4.26 |
+
+Nouveaux cas : TC-API01 à TC-API07, TC-H01 à TC-H05, TC-A06, et 5 scénarios BDD (2 fonctionnalités). TC-P02 cherche désormais le bouton de langue par son texte exact.
+
+**Défauts trouvés :**
+
+| Défaut | Trouvé par | Suite donnée |
+|---|---|---|
+| DEF-011 : dépôt des tests sans description ni sujets | TC-API04 | Ouvert ; test marqué `xfail` avec la référence du défaut |
+| DEF-012 : le projet de tests absent du portfolio | TC-API01 (liste des projets ≠ liens de la page) | Corrigé ; TC-API01 réussit |
+| DEF-013 : nom accessible du bouton de langue différent du texte visible | Scénario BDD « Lire le portfolio dans ma langue » (délai dépassé en cherchant « English ») | Corrigé ; TC-A06 échouait sur la version d'origine |
+
+**Problèmes des tests eux-mêmes, corrigés pendant la mise au point :**
+- TC-H04 lisait la taille compressée du modèle (9 Mo au lieu de 15 Mo) : Playwright accepte gzip. Correction : `Accept-Encoding: identity`.
+- Sans jeton, l'API GitHub limite à 60 requêtes par heure et par adresse IP ; en développement, la limite a été atteinte. Correction : jeton `GITHUB_TOKEN` en CI, cache des réponses, message d'échec explicite.
+- L'étape BDD générique « j'envoie {fichier} » captait aussi « j'envoie l'image de référence ». Correction : expression régulière limitée aux valeurs prévues.
+- Le titre de section bilingue contenait les deux langues dans son texte (`ProjetsProjects`) ; l'étape vérifie maintenant le nom accessible, qui ne contient que la langue affichée.
+
+<p align="center"><img src="images/rapport_pytest_html_api_bdd.png" width="80%" alt="Rapport pytest-html sur Chromium : 88 réussis, 1 échec attendu"></p>
+
 ## Campagne du 21 novembre 2026 (ajout de la démo des pièces)
 
 | | |
