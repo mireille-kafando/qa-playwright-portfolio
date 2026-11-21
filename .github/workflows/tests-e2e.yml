@@ -8,6 +8,9 @@ on:
     - cron: "15 12 * * *"   # chaque jour à 12 h 15 UTC (7 h 15 heure de l'Est) : surveillance du site en production
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   e2e:
     runs-on: ubuntu-latest
@@ -27,6 +30,8 @@ jobs:
       - name: Installer le navigateur
         run: python -m playwright install --with-deps ${{ matrix.navigateur }}
       - name: Lancer les tests
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # tests d'API : 1 000 requêtes par heure au lieu de 60
         run: >
           pytest --browser ${{ matrix.navigateur }}
           --html=rapport/rapport-${{ matrix.navigateur }}.html --self-contained-html

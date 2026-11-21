@@ -1,4 +1,4 @@
-"""Vérifications d'accessibilité de base sur les deux pages (cas TC-A01 à TC-A05)."""
+"""Vérifications d'accessibilité de base sur les pages du site (cas TC-A01 à TC-A06)."""
 import pytest
 from playwright.sync_api import Page, expect
 
@@ -46,3 +46,16 @@ def test_tc_a05_resultat_de_la_demo_decrit_en_texte(page: Page, base_url: str):
     expect(canvas).to_have_attribute("role", "img")
     nombre = page.locator("#nPed").inner_text()
     expect(canvas).to_have_attribute("aria-label", f"Image analysée : {nombre} piéton(s) et 0 cycliste(s) ou motard(s) détectés, modèle v2, seuil 0,25")
+
+
+@pytest.mark.parametrize("chemin", PAGES)
+def test_tc_a06_nom_accessible_contient_le_texte_visible(page: Page, base_url: str, chemin):
+    """WCAG 2.5.3 (Label in Name) : un bouton se commande à la voix par le texte qu'on voit.
+
+    Défaut DEF-013 : le bouton « English » s'appelait « Changer de langue / switch language ».
+    """
+    page.goto(base_url + chemin)
+    ecarts = page.evaluate("""() => [...document.querySelectorAll('button[aria-label], a[aria-label]')]
+        .filter(e => e.innerText.trim() && !e.getAttribute('aria-label').toLowerCase().includes(e.innerText.trim().toLowerCase()))
+        .map(e => `${e.innerText.trim()} → ${e.getAttribute('aria-label')}`)""")
+    assert ecarts == []

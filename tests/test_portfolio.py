@@ -21,12 +21,12 @@ def test_tc_p01_titre_et_identite(accueil: Page):
 
 def test_tc_p02_bascule_de_langue_et_persistance(accueil: Page):
     expect(accueil.locator("html")).to_have_attribute("lang", "fr")
-    accueil.get_by_role("button", name=re.compile("English|switch language")).click()
+    accueil.get_by_role("button", name="English").click()
     expect(accueil.locator("html")).to_have_attribute("lang", "en")
     expect(accueil.get_by_role("heading", name="Skills")).to_be_visible()
     accueil.reload()
     expect(accueil.locator("html")).to_have_attribute("lang", "en"), "la préférence de langue doit survivre au rechargement"
-    accueil.get_by_role("button", name=re.compile("Français|switch language")).click()
+    accueil.get_by_role("button", name="Français").click()
     expect(accueil.get_by_role("heading", name="Compétences")).to_be_visible()
 
 

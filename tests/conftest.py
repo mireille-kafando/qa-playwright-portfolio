@@ -1,5 +1,6 @@
 """Fixtures communes : collecte des erreurs de la console, pages de démo prêtes, données de test."""
 import json
+import os
 from pathlib import Path
 
 import pytest
@@ -74,3 +75,58 @@ def reference_pieces():
     """Image synthétique et probabilités calculées en Python (onnxruntime) avec le même modèle."""
     ref = json.loads((DONNEES / "reference_piece_synthetique.json").read_text())
     return DONNEES / ref["image"], ref["probabilites"]
+
+
+# --- Tests d'API et HTTP (TC-API, TC-H) : pas de navigateur, seulement des requêtes ---
+PROPRIETAIRE = "mireille-kafando"
+
+
+@pytest.fixture(scope="session")
+def api_github(playwright):
+    """Client de l'API REST de GitHub (APIRequestContext de Playwright).
+
+    Sans jeton, GitHub limite à 60 requêtes par heure ; dans la CI, le jeton GITHUB_TOKEN du workflow
+    relève cette limite. Le jeton n'apparaît jamais dans les rapports.
+    """
+    entetes = {"Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28"}
+    if os.environ.get("GITHUB_TOKEN"):
+        entetes["Authorization"] = f"Bearer {os.environ['GITHUB_TOKEN']}"
+    contexte = playwright.request.new_context(base_url="https://api.github.com", extra_http_headers=entetes)
+    yield contexte
+    contexte.dispose()
+
+
+@pytest.fixture(scope="session")
+def http_site(playwright, base_url):
+    """Client HTTP du site en ligne, sans navigateur."""
+    contexte = playwright.request.new_context(base_url=base_url)
+    yield contexte
+    contexte.dispose()
+
+
+def verifier(reponse):
+    """Échoue avec un message clair si l'API refuse la requête, au lieu d'une erreur obscure plus loin."""
+    if reponse.status == 403 and reponse.headers.get("x-ratelimit-remaining") == "0":
+        pytest.fail("Limite de débit de l'API GitHub atteinte : définir GITHUB_TOKEN (60 requêtes par heure sans jeton)")
+    assert reponse.ok, f"{reponse.url} : HTTP {reponse.status}"
+    return reponse.json()
+
+
+@pytest.fixture(scope="session")
+def depots(api_github):
+    """Réponses de l'API pour chaque dépôt, mises en cache le temps de la session (moins de requêtes)."""
+    cache = {}
+
+    def lire(nom):
+        if nom not in cache:
+            cache[nom] = api_github.get(f"/repos/{PROPRIETAIRE}/{nom}")
+        return cache[nom]
+    return lire
+
+
+@pytest.fixture(autouse=True)
+def api_sur_chromium_seulement(request):
+    """Les tests d'API et HTTP ne dépendent pas du navigateur : une seule exécution, dans la tâche Chromium."""
+    navigateurs = request.config.getoption("--browser") or ["chromium"]
+    if request.node.get_closest_marker("api") and "chromium" not in navigateurs:
+        pytest.skip("test sans navigateur : exécuté dans la tâche Chromium")
