@@ -16,7 +16,7 @@ pytestmark = pytest.mark.api
 
 # Dépôts présentés sur le portfolio. TC-API01 vérifie que cette liste et les liens de la page concordent.
 PROJETS = ["software-defect-prediction-promise", "pedestrian-detection-adas", "qa-playwright-portfolio",
-           "coin-classification-cnn", "csharp-immutability-experiment-statistics"]
+           "accidents-routiers-quebec", "coin-classification-cnn", "csharp-immutability-experiment-statistics"]
 
 # Contrat : les champs de la réponse sur lesquels les tests s'appuient, avec leur type.
 SCHEMA_DEPOT = {

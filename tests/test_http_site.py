@@ -8,7 +8,7 @@ import pytest
 
 pytestmark = pytest.mark.api
 
-PAGES = ["/", "/demo-pietons/", "/demo-pieces/"]
+PAGES = ["/", "/demo-pietons/", "/demo-pieces/", "/accidents-quebec/"]
 MODELES = {"/demo-pietons/model/v2.onnx": (10e6, 16e6), "/demo-pieces/model/pieces_vgg16_int8.onnx": (12e6, 18e6)}
 
 

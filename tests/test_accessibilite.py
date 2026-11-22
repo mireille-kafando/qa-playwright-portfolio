@@ -3,7 +3,7 @@ import pytest
 from playwright.sync_api import Page, expect
 
 pytestmark = pytest.mark.a11y
-PAGES = ["/", "/demo-pietons/", "/demo-pieces/"]
+PAGES = ["/", "/demo-pietons/", "/demo-pieces/", "/accidents-quebec/"]
 
 
 @pytest.mark.parametrize("chemin", PAGES)
