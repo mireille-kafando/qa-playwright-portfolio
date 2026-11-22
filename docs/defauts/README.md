@@ -14,6 +14,6 @@ Défauts trouvés sur le portfolio et les démos, par les tests automatisés, l'
 | [DEF-008](DEF-008.md) | Les barres de probabilité de la démo des pièces restent vides | Majeure | Corrigé avant la mise en ligne | TC-C04 |
 | [DEF-009](DEF-009.md) | Un pourcentage de la démo des pièces passe sur deux lignes | Cosmétique | Corrigé avant la mise en ligne | TC-C05 |
 | [DEF-010](DEF-010.md) | Probabilité élevée pour une image qui n'est pas une pièce | Mineure | Accepté (limite connue, avertissement ajouté) | TC-C02 |
-| [DEF-011](DEF-011.md) | Le dépôt des tests n'a ni description ni sujets sur GitHub | Mineure | Ouvert (réglage GitHub à faire) | TC-API04 |
+| [DEF-011](DEF-011.md) | Le dépôt des tests n'a ni description ni sujets sur GitHub | Mineure | Corrigé | TC-API04 |
 | [DEF-012](DEF-012.md) | Le portfolio ne présentait pas le projet de tests | Majeure | Corrigé | TC-API01, scénario BDD |
 | [DEF-013](DEF-013.md) | Le nom accessible du bouton de langue ne contient pas son texte visible | Mineure | Corrigé | TC-A06, scénario BDD |

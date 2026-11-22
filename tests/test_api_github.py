@@ -57,12 +57,9 @@ def test_tc_api03_reponse_conforme_au_schema(depots, nom):
     validate(instance=verifier(depots(nom)), schema=SCHEMA_DEPOT)
 
 
-@pytest.mark.parametrize("nom", [
-    pytest.param(n, marks=pytest.mark.xfail(reason="DEF-011 : description et sujets du dépôt à remplir dans GitHub",
-                                            strict=False))
-    if n == "qa-playwright-portfolio" else n for n in PROJETS])
+@pytest.mark.parametrize("nom", PROJETS)
 def test_tc_api04_depot_presentable(depots, nom):
-    """Ce qu'un recruteur voit en premier : une description, une licence, au moins 3 sujets."""
+    """Ce qu'un recruteur voit en premier : une description, une licence, au moins 3 sujets (DEF-011)."""
     depot = verifier(depots(nom))
     assert (depot["description"] or "").strip(), "description vide"
     assert depot["license"] and depot["license"]["spdx_id"] not in ("", "NOASSERTION"), "pas de licence"

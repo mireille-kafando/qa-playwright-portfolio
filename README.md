@@ -12,7 +12,7 @@ Projet d'assurance qualité sur un système réel : mon [portfolio](https://mire
 |---|---|
 | Plan de test | [`docs/plan_de_test.md`](docs/plan_de_test.md) : objectifs, périmètre, approche, 49 cas de test et 5 scénarios BDD, critères de sortie, risques |
 | Tests automatisés | 54 tests (147 exécutions sur Chromium et Firefox) : parcours utilisateur, cas d'erreur, cohérence du modèle avec une référence Python, accessibilité, liens, API REST de GitHub, HTTP du site, scénarios BDD |
-| Défauts | [`docs/defauts/`](docs/defauts/) : 13 rapports (1 bloquant, 3 majeurs, 7 mineurs, 2 cosmétiques) ; 11 corrigés et couverts par un test, 1 accepté comme limite connue, 1 ouvert |
+| Défauts | [`docs/defauts/`](docs/defauts/) : 13 rapports (1 bloquant, 3 majeurs, 7 mineurs, 2 cosmétiques) ; 12 corrigés et couverts par un test, 1 accepté comme limite connue |
 | Exécution | [`docs/rapport_execution.md`](docs/rapport_execution.md) : toutes les exécutions réussies, et vérification que les tests de non-régression échouent sur l'ancienne version |
 | Intégration continue | GitHub Actions : à chaque modification, chaque jour et à la demande ; rapports HTML, JUnit et traces publiés |
 
@@ -38,7 +38,7 @@ Choix de conception :
 - **Non-régression :** chaque défaut corrigé a son test, vérifié en le lançant sur la version d'avant la correction.
 - **API et HTTP :** ces tests utilisent l'`APIRequestContext` de Playwright, sans navigateur. Ils sont rapides, ne tournent qu'une fois par exécution de la CI, et séparent un problème de serveur d'un problème d'affichage. Le contrat de l'API est vérifié par un schéma JSON.
 - **BDD :** les scénarios sont écrits en français (`# language: fr`), dans des phrases qu'une personne non technique peut relire. Les étapes Python réutilisent les localisateurs et l'oracle des autres tests.
-- **Défaut ouvert :** un test qui révèle un défaut non encore corrigé est marqué `xfail` (échec attendu) avec la référence du défaut, plutôt que supprimé ou ignoré.
+- **Défaut ouvert :** un test qui révèle un défaut non encore corrigé est marqué `xfail` (échec attendu) avec la référence du défaut, plutôt que supprimé ou ignoré. C'est ce qui a été fait pour DEF-011, jusqu'à sa correction : la marque a alors été retirée et le test sert de non-régression.
 
 ## Lancer les tests
 
@@ -108,5 +108,5 @@ A QA project on a real system: my portfolio site and its two in-browser ML demos
   - BDD scenarios in French Gherkin (pytest-bdd), including a scenario outline;
   - test oracle: the coin demo must reproduce, within 0.001, the class probabilities computed in Python with the same ONNX model on a synthetic image;
   - selectors are role-based.
-- **Defect reports** ([`docs/defauts/`](docs/defauts/)): 13 real defects (1 blocker, 3 major, 7 minor, 2 cosmetic), each with steps to reproduce and either the fix with a regression test or, for one model limitation, the decision to accept it with a warning; one is open and tracked by an expected-failure (`xfail`) test. The regression tests were confirmed to fail on the pre-fix version.
+- **Defect reports** ([`docs/defauts/`](docs/defauts/)): 13 real defects (1 blocker, 3 major, 7 minor, 2 cosmetic), each with steps to reproduce and either the fix with a regression test or, for one model limitation, the decision to accept it with a warning; one was tracked by an expected-failure (`xfail`) test until it was fixed. The regression tests were confirmed to fail on the pre-fix version.
 - **CI**: GitHub Actions runs the suite on every push, daily against production, and on demand, publishing HTML/JUnit reports and Playwright traces.
